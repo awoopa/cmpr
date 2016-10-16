@@ -1,11 +1,18 @@
 import requests
 import json
 import nltk
+import bs4
 
 from clarifai.rest import ClarifaiApp
 
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
+
+from htmlmin import minify
+
+from bs4 import BeautifulSoup
+
+from core import *
 
 app = Flask(__name__)
 CORS(app)
@@ -24,6 +31,11 @@ def convert_html():
   data = request.form
   html = data['page']
   return convert(html)
+
+def convert(html):
+  soup = BeautifulSoup(html, 'html.parser')
+  do_things_to_html(soup, word_color)
+  return minify(soup.prettify()).encode('utf-8')
 
 def clarifai_analysis(image_url, tag_limit=10):
   """
@@ -152,6 +164,20 @@ def word_color(text):
 
 def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
+  import pdb; pdb.set_trace()
+  convert("""
+CTYPE html>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+
+<p>My first paragraph.</p>
+
+</body>
+</html>
+
+  """)
   app.run(debug=False, use_reloader=False)
 
 if __name__ == '__main__':
