@@ -30,7 +30,8 @@ def convert_html():
   data = request.form
   html = data['page']
   host = data['host']
-  return convert(html, host)
+  count, html = convert(html, host)
+  return json.dumps({'count': count, 'html': html})
 
 def add_hostname(url, host):
   if url.startswith('/') and not url.startswith('//'):
@@ -40,7 +41,8 @@ def add_hostname(url, host):
 def convert(html, host):
   soup = BeautifulSoup(html, 'html.parser')
   do_things_to_html(soup, word_color, lambda x: unicode(clarifai_analysis(add_hostname(x, host))))
-  return minify(soup.prettify()).encode('utf-8')
+  count = word_count(soup)
+  return count,minify(soup.prettify()).encode('utf-8')
 
 def clarifai_analysis(image_url, tag_limit=10):
   """
@@ -111,6 +113,8 @@ def pos_tagging(text):
                        json=json_txt)
   
   jres = json.loads(res.text)
+  if 'error' in jres:
+    return [tup[1] for tup in nltk.pos_tag(nltk.word_tokenize(text))]
 
   return jres[0]['result'][0]
 
@@ -172,6 +176,7 @@ def summarize(text, target_sentences=5):
   Given all the text in a page, determine a number of summarizing sentences.
   """
 
+
 def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
   import pdb; pdb.set_trace()
@@ -187,7 +192,7 @@ def main():
 </body>
 </html>
   """, "localhost")
-  app.run(debug=False, use_reloader=False)
+  app.run(debug=False, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':
   main()
