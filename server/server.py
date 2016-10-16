@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 
 from core import *
 
+from nltk.tag.perceptron import PerceptronTagger
+
 app = Flask(__name__)
 CORS(app)
 
@@ -20,6 +22,8 @@ clarifai = ClarifaiApp(app_id='VWLdaFkl56G5o81k54s-ZI6se11adzKSFnVQ_Ggg',
                        app_secret='QnVFC6wRIWDplb3SZBVX5iMLje_tA9oWtyj8WpcH')
 
 clarifai_model = clarifai.models.get('general-v1.3')
+
+tagger = PerceptronTagger()
 
 @app.route('/convert_html', methods=['POST'])
 def convert_html():
@@ -114,7 +118,7 @@ def pos_tagging(text):
   
   jres = json.loads(res.text)
   if 'error' in jres:
-    return [tup[1] for tup in nltk.pos_tag(nltk.word_tokenize(text))]
+    return [tup[1] for tup in tagger.tag(nltk.word_tokenize(text))]
 
   return jres[0]['result'][0]
 
