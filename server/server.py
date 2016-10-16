@@ -29,12 +29,14 @@ def convert_html():
   """
   data = request.form
   html = data['page']
-  return convert(html)
+  count, html = convert(html)
+  return json.dumps({'count': count, 'html': html})
 
 def convert(html):
   soup = BeautifulSoup(html, 'html.parser')
+  count = word_count(soup)
   do_things_to_html(soup, word_color)
-  return minify(soup.prettify()).encode('utf-8')
+  return count,minify(soup.prettify()).encode('utf-8')
 
 def clarifai_analysis(image_url, tag_limit=10):
   """
@@ -105,6 +107,8 @@ def pos_tagging(text):
                        json=json_txt)
   
   jres = json.loads(res.text)
+  if 'error' in jres:
+    return [tup[1] for tup in nltk.pos_tag(nltk.word_tokenize(text))]
 
   return jres[0]['result'][0]
 
@@ -165,6 +169,7 @@ def summarize(text, target_sentences=5):
   """
   Given all the text in a page, determine a number of summarizing sentences.
   """
+
 
 def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
