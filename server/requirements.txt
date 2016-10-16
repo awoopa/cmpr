@@ -7,4 +7,4 @@ htmlmin==0.1.10
 nltk==3.2.1
 requests==2.11.1
 urllib3==1.16
-
+Rapidconnect==0.0.3
