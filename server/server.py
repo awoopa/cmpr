@@ -32,7 +32,7 @@ def convert_html():
   transformations, and return the new HTML.
   """
   print('test')
-  data = request.get_json()
+  data = request.get_json(foroce=True)
   html = data['page']
   host = data['host']
   count, html = convert(html, host)
