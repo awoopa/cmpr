@@ -24,6 +24,10 @@ def word_count(soup):
   texts = soup.find_all(string=True)
   return sum(map(lambda s: len(s.split()), (filter(visible, texts))))
 
+def all_text(soup):
+  texts = soup.find_all(string=True)
+  return "\n".join(map(unicode, filter(visible, texts)))
+
 def tokenize(text):
   from random import randint
   return [(i, 'NN' if randint(0, 1) == 0 else 'VBZ') for i in text.split()]
