@@ -3,6 +3,8 @@ import json
 import nltk
 import math
 
+from rapidconnect import RapidConnect
+
 from clarifai.rest import ClarifaiApp
 
 from flask import Flask, request, jsonify
@@ -44,6 +46,7 @@ for s in brown.sents():
     word_couts[w] += 1
 
 brown_sent_count = len(brown.sents())
+rapid = RapidConnect('cmpre', 'a0c4b418-1531-4c31-abbe-24df50f8a74b');
 
 @app.route('/convert_html', methods=['POST'])
 def convert_html():
@@ -93,6 +96,7 @@ def oxford_project_analysis(image_url):
   Given an image url, return a description of the image as returned by the
   Oxford project API (cognitive services). Also returns tags.
   """
+  """
   json_text = {'url': image_url}
   headers = {'Ocp-Apim-Subscription-Key': '12a4c0f569884fe5b4c528b51dc890b3'}
   res = requests.post('https://api.projectoxford.ai/vision/v1.0/describe',
@@ -100,6 +104,12 @@ def oxford_project_analysis(image_url):
                        json=json_text)
 
   jres = json.loads(res.text)
+  """
+  jres = rapid.call('MicrosoftComputerVision', 'describeImage', {
+    'image': image_url,
+    'subscriptionKey': '12a4c0f569884fe5b4c528b51dc890b3',
+    'maxCandidates': ''
+  });
 
   return (
     jres[u'description'][u'tags'],
