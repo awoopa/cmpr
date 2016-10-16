@@ -16,6 +16,7 @@ def visible(element):
 def retrieve_text(soup):
   print(soup)
   texts = soup.find_all(string=True)
+  print(texts)
   return filter(visible, texts)
 
 def tokenize(text):
@@ -57,3 +58,19 @@ def do_things_to_html(soup, tokenizer):
       else:
         node.replace_with(tag)
         cur_node = tag
+
+def test():
+	soup = BeautifulSoup("""
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+
+<p>My first paragraph.</p>
+
+</body>
+</html>
+""", "html.parser")
+	do_things_to_html(soup, tokenize)
+	print(soup)
