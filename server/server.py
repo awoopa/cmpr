@@ -27,12 +27,10 @@ def convert_html():
   Given an HTML page as a string, apply all of our comprehension-improving
   transformations, and return the new HTML.
   """
-  print('test')
   data = request.get_json()
   html = data['page']
   host = data['host']
   count, html = convert(html, host)
-  print('here')
   return json.dumps({'count': count, 'html': html})
 
 def add_hostname(url, host):
@@ -40,11 +38,15 @@ def add_hostname(url, host):
     return host.rstrip('/') + url
   return url
 
+def capme(host, x):
+  a, b = analyze_image(add_hostname(x, host))
+  return b + " (" + ', '.join(a) + ")"
+
 def convert(html, host):
   if not host.startswith('http'):
     host = 'http://' + host
   soup = BeautifulSoup(html, 'html.parser')
-  do_things_to_html(soup, word_color, lambda x: unicode(clarifai_analysis(add_hostname(x, host))))
+  do_things_to_html(soup, word_color, lambda x: capme(host, x))
   count = word_count(soup)
   return count,minify(soup.prettify()).encode('utf-8')
 
@@ -69,8 +71,8 @@ def oxford_project_analysis(image_url):
   jres = json.loads(res.text)
 
   return (
-    jres['description']['tags'],
-    jres['description']['captions'][0]['text'] if len(jres['descriptions']['captions']) else ''
+    jres[u'description'][u'tags'],
+    jres[u'description'][u'captions'][0][u'text'] if len(jres[u'description'][u'captions']) else ''
   )
   
 def analyze_image(image_url, tag_limit=10): 
@@ -81,8 +83,8 @@ def analyze_image(image_url, tag_limit=10):
     (1) A list of tags, limited by tag_limit,
     (2) A description of the image
   """
-  clarifai_tags = clarifai_analysis(image_url),
-  ms_tags, ms_caption = oxford_project_analys(image_url)
+  clarifai_tags = clarifai_analysis(image_url)
+  ms_tags, ms_caption = oxford_project_analysis(image_url)
 
   clarifai_tags = map(lambda s: s.lower(), clarifai_tags)
   ms_tags = map(lambda s: s.lower(), ms_tags)
@@ -95,7 +97,7 @@ def analyze_image(image_url, tag_limit=10):
       merged_tags.append(tag)
  
   merged_tags_set = set(merged_tags)
-  merged_tags += [tag for tag in clarifa_tags if tag not in merged_tags]
+  merged_tags += [tag for tag in clarifai_tags if tag not in merged_tags]
   merged_tags += [tag for tag in ms_tags if tag not in merged_tags]
 
   # Limit the tags
