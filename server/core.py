@@ -61,7 +61,10 @@ a { text-decoration: underline !important }
     src = node.attrs['src']
     fig = soup.new_tag('figure', **{'class': 'cFIG'})
     caption = soup.new_tag('figcaption')
-    caption.string = describer(src)
+    try:
+      caption.string = describer(src)
+    except:
+      pass
     node.replace_with(fig)
     fig.append(node)
     node.insert_after(caption)
