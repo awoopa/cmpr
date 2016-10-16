@@ -36,11 +36,11 @@ def oxford_project_analysis(image_url):
   Given an image url, return a description of the image as returned by the
   Oxford project API (cognitive services). Also returns tags.
   """
-  json = {'url': image_url}
+  json_text = {'url': image_url}
   headers = {'Ocp-Apim-Subscription-Key': '12a4c0f569884fe5b4c528b51dc890b3'}
   res = requests.post('https://api.projectoxford.ai/vision/v1.0/describe',
                        headers=headers,
-                       json=json)
+                       json=json_text)
 
   jres = json.loads(res.text)
 
@@ -78,6 +78,23 @@ def analyze_image(image_url, tag_limit=10):
   merged_tags = merged_tags[:tag_limit]
 
   return merged_tags, ms_caption
+
+def pos_tagging(text):
+  """
+  Given some text as input, return the part of speech tagging as determined by
+  the Microsoft Cognitive Services API.
+  """
+  json_txt = {'language': 'en',
+          'analyzerIds' : ["4fa79af1-f22c-408d-98bb-b7d7aeef7f04"],
+          'text': text}
+  headers = {'Ocp-Apim-Subscription-Key': '6728888dd73c45ada252a5f46cb0ccba'}
+  res = requests.post('https://api.projectoxford.ai/linguistics/v1.0/analyze',
+                       headers=headers,
+                       json=json_txt)
+  
+  jres = json.loads(res.text)
+
+  return jres[0]['result'][0]
 
 def main():
   app.run(debug=False, use_reloader=False)
