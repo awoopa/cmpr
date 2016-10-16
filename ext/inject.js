@@ -21,7 +21,7 @@ function colourize() {
 	padding-top: 200px;`
 	document.body.appendChild(overlayDiv);
 
-	fetch('http://52.43.238.240:5000/convert_html', {
+	fetch('https://52.43.238.240:5000/convert_html', {
 		method: 'POST',
 		body: JSON.stringify({
 			page: html,
@@ -42,6 +42,14 @@ var state = false;
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.getState) {
 		sendResponse({state: state});
+	}
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.getText) {
+	    window.speechSynthesis.speak(
+		   new SpeechSynthesisUtterance(document.body.innerText)
+		);
 	}
 });
 

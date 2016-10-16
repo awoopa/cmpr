@@ -18,7 +18,8 @@
 
 	"permissions": [
 		"https://ajax.googleapis.com/",
-		"storage"
+		"storage",
+		"tts"
 	],
 
 	"background": {

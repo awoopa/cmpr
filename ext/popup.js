@@ -20,4 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('status').addEventListener('click', () => {
 		chrome.tabs.create({url: 'dataviz.html'});
 	});
+
+	document.getElementById('speak').addEventListener('click', () => {
+		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		  chrome.tabs.sendMessage(tabs[0].id, {getText: true}, function(response) {
+		  });
+		});
+	})
 });
