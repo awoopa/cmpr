@@ -14,31 +14,25 @@ def visible(element):
   return True
 
 def retrieve_text(soup):
-  print(soup)
   texts = soup.find_all(string=True)
-  print(texts)
   return filter(visible, texts)
+
+def retrieve_images(soup):
+  return soup.find_all('img')
 
 def tokenize(text):
   from random import randint
   return [(i, 'NN' if randint(0, 1) == 0 else 'VBZ') for i in text.split()]
 
-def do_things_to_html(soup, tokenizer):
+def do_things_to_html(soup, tokenizer, describer):
   style = soup.new_tag('style', type='text/css')
   style.append(
-      '''.cNN {
-      color: red
-  }
-  .cVBZ {
-      color: blue
-  }
-  .cINV {
-      color: brown
-  }
-  a {
-      text-decoration: underline !important
-  }
-  ''')
+'''.cNN { color: red }
+.cVBZ { color: blue }
+.cINV { color: brown }
+.cFIG { display: inline-block; margin: 0 }
+a { text-decoration: underline !important }
+''')
   if not soup.head:
     head = soup.new_tag('head')
     soup.html.append(head)
@@ -58,21 +52,20 @@ def do_things_to_html(soup, tokenizer):
       else:
         node.replace_with(tag)
         cur_node = tag
+  for node in retrieve_images(soup):
+    src = node.attrs['src']
+    fig = soup.new_tag('figure', **{'class': 'cFIG'})
+    caption = soup.new_tag('figcaption')
+    caption.string = describer(src)
+    node.replace_with(fig)
+    fig.append(node)
+    node.insert_after(caption)
 
 def test():
-	soup = BeautifulSoup("""
-<!DOCTYPE html>
-<html>
-<body>
-
-<h1>My First Heading</h1>
-
-<p>My first paragraph.</p>
-
-</body>
-</html>
-""", "html.parser")
-	do_things_to_html(soup, tokenize)
-	print(soup)
+	from urllib import urlopen
+	soup = BeautifulSoup(urlopen("http://en.wikipedia.org/wiki/Electron").read(), "html.parser")
+	do_things_to_html(soup, tokenize, lambda x: x)
+	with open('test.html', 'w') as f:
+		f.write(soup.prettify().encode('utf-8'))
 
 test()
