@@ -171,7 +171,7 @@ def word_color(text):
     if last_tup[0][-1].isalpha():
       last_tup = (
         last_tup[0] + tup[0],
-        'INV' if last_tup[1] != tup[1] else tup[1]
+        last_tup[1]
       )
     else:
       merged_word_tups.append(last_tup)
