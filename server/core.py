@@ -22,8 +22,11 @@ def retrieve_images(soup):
 
 def word_count(soup):
   texts = soup.find_all(string=True)
-  print(texts)
   return sum(map(lambda s: len(s.split()), (filter(visible, texts))))
+
+def all_text(soup):
+  texts = soup.find_all(string=True)
+  return "\n".join(map(unicode, filter(visible, texts)))
 
 def tokenize(text):
   from random import randint
