@@ -36,7 +36,8 @@ def do_things_to_html(soup, tokenizer, describer):
 .cNN,
 .cNNP,
 .cNNPS,
-.cNNS {
+.cNNS,
+.cPRP {
     color: #F92672;
 }
 .cVB,
@@ -47,6 +48,15 @@ def do_things_to_html(soup, tokenizer, describer):
 .cVBZ {
     color: #66D9EF;
 }
+.cRB,
+.cRBR,
+.cRBS,
+.cJJ,
+.cJJR,
+.cJJS {
+    color: #A6E22E;
+}
+
 .cINV {
     color: brown
 }
