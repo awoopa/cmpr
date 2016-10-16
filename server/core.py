@@ -74,3 +74,5 @@ def test():
 """, "html.parser")
 	do_things_to_html(soup, tokenize)
 	print(soup)
+
+test()

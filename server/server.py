@@ -1,7 +1,6 @@
 import requests
 import json
 import nltk
-import bs4
 
 from clarifai.rest import ClarifaiApp
 
