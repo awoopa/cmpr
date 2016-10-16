@@ -53,8 +53,6 @@ def add_hostname(url, host, hostrel):
     return host.rstrip('/') + hostrel.replace("[^/]*$", "/") + url
 
 def capme(host, hostrel, x):
-  print("HOST: " + host)
-  print(add_hostname(x,host, hostrel))
   a, b = analyze_image(add_hostname(x, host, hostrel))
   return b + " (" + ', '.join(a) + ")"
 
@@ -157,9 +155,6 @@ def word_color(text):
   words = nltk.word_tokenize(text)
   pos_tags = pos_tagging(text)
 
-  print(len(words))
-  print(len(pos_tags))
-
   word_tups = []
 
   # last index
@@ -181,6 +176,11 @@ def word_color(text):
     li = i
     j += 1
 
+  word_tups[-1] = (
+    word_tups[-1][0] + text[i:],
+    word_tups[-1][1]
+  )
+
   # Merge the tups if incorrectly split by tokenizer, give them a new 
   # pos tag: 'INV'
   merged_word_tups = []
@@ -197,6 +197,14 @@ def word_color(text):
 
   merged_word_tups.append(last_tup)
   merged_word_tups = merged_word_tups[1:]
+
+  if 'interchange' in text and len(word_tups) != len(merged_word_tups):
+    print(len(pos_tags))
+    print(i)
+    print(j)
+    print(text)
+    print(word_tups)
+    print(merged_word_tups)
 
   return merged_word_tups
 
@@ -221,7 +229,8 @@ def main():
 </body>
 </html>
   """, "localhost", "localhost")
-  app.run(debug=False, use_reloader=False, host='0.0.0.0')
+  context = ('cert.pem', 'key.pem')
+  app.run(debug=False, use_reloader=False, host='0.0.0.0', ssl_context=context)
 
 if __name__ == '__main__':
   main()
