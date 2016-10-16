@@ -114,19 +114,19 @@ def pos_tagging(text):
   Given some text as input, return the part of speech tagging as determined by
   the Microsoft Cognitive Services API.
   """
-  json_txt = {'language': 'en',
-          'analyzerIds' : ["4fa79af1-f22c-408d-98bb-b7d7aeef7f04"],
-          'text': text}
-  headers = {'Ocp-Apim-Subscription-Key': '6728888dd73c45ada252a5f46cb0ccba'}
-  res = requests.post('https://api.projectoxford.ai/linguistics/v1.0/analyze',
-                       headers=headers,
-                       json=json_txt)
-  
-  jres = json.loads(res.text)
-  if 'error' in jres:
-    return [tup[1] for tup in tagger.tag(nltk.word_tokenize(text))]
+  #json_txt = {'language': 'en',
+  #        'analyzerIds' : ["4fa79af1-f22c-408d-98bb-b7d7aeef7f04"],
+  #        'text': text}
+  #headers = {'Ocp-Apim-Subscription-Key': '6728888dd73c45ada252a5f46cb0ccba'}
+  #res = requests.post('https://api.projectoxford.ai/linguistics/v1.0/analyze',
+  #                     headers=headers,
+  #                     json=json_txt)
+  #
+  #jres = json.loads(res.text)
+  #if 'error' in jres:
 
-  return jres[0]['result'][0]
+  #return jres[0]['result'][0]
+  return [tup[1] for tup in tagger.tag(nltk.word_tokenize(text))]
 
 def word_color(text):
   """
