@@ -31,10 +31,12 @@ def convert_html():
   Given an HTML page as a string, apply all of our comprehension-improving
   transformations, and return the new HTML.
   """
-  data = request.form
+  print('test')
+  data = request.get_json()
   html = data['page']
   host = data['host']
   count, html = convert(html, host)
+  print('here')
   return json.dumps({'count': count, 'html': html})
 
 def add_hostname(url, host):
@@ -43,6 +45,8 @@ def add_hostname(url, host):
   return url
 
 def convert(html, host):
+  if not host.startswith('http'):
+    host = 'http://' + host
   soup = BeautifulSoup(html, 'html.parser')
   do_things_to_html(soup, word_color, lambda x: unicode(clarifai_analysis(add_hostname(x, host))))
   count = word_count(soup)
