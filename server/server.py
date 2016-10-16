@@ -29,11 +29,17 @@ def convert_html():
   """
   data = request.form
   html = data['page']
-  return convert(html)
+  host = data['host']
+  return convert(html, host)
 
-def convert(html):
+def add_hostname(url, host):
+  if url.startswith('/') and not url.startswith('//'):
+    return host.rstrip('/') + url
+  return url
+
+def convert(html, host):
   soup = BeautifulSoup(html, 'html.parser')
-  do_things_to_html(soup, word_color)
+  do_things_to_html(soup, word_color, lambda x: unicode(clarifai_analysis(add_hostname(x, host))))
   return minify(soup.prettify()).encode('utf-8')
 
 def clarifai_analysis(image_url, tag_limit=10):
@@ -170,7 +176,7 @@ def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
   import pdb; pdb.set_trace()
   convert("""
-CTYPE html>
+<!DOCTYPE html>
 <html>
 <body>
 
@@ -180,8 +186,7 @@ CTYPE html>
 
 </body>
 </html>
-
-  """)
+  """, "localhost")
   app.run(debug=False, use_reloader=False)
 
 if __name__ == '__main__':
