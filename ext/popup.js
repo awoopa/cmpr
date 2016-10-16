@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-	document.getElementById('status').textContent = 'Nice meme!';
-
 	document.getElementById('status').addEventListener('click', () => {
 		chrome.tabs.create({url: 'dataviz.html'});
 	})
