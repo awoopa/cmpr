@@ -24,11 +24,20 @@ def tokenize(text):
 def do_things_to_html(soup, tokenizer):
     style = soup.new_tag('style', type='text/css')
     style.append(
-    '''.cNN {
-        color: red
+    '''
+    .cNN,
+    .cNNP,
+    .cNNPS,
+    .cNNS {
+        color: #F92672;
     }
+    .cVB,
+    .cVBD,
+    .cVBG,
+    .cVBN,
+    .cVBP,
     .cVBZ {
-        color: blue
+        color: #66D9EF;
     }
     .cINV {
         color: brown

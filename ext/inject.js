@@ -4,9 +4,19 @@ function colourize() {
 	var html = document.documentElement.innerHTML;
 	console.log("colourize()");
 
-	numWords = Math.random() * 100 + 10;
-
-	timerStart = Date.now();
+	fetch('http://52.43.238.240:5000/convert_html', {
+		method: 'POST',
+		body: JSON.stringify({
+			page: html,
+			host: `//${window.location.origin}`
+		})
+	}).then(res => {
+		res.json().then(data => {
+			document.documentElement.innerHTML = data.html;
+			numWords = data.count;
+			timerStart = Date.now();
+		})
+	})
 }
 
 var state = false;
