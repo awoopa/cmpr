@@ -34,23 +34,31 @@ def convert_html():
   data = request.get_json(force=True)
   html = data['page']
   host = data['host']
-  count, html = convert(html, host)
+  hostrel = data['hostrel']
+  count, html = convert(html, host, hostrel)
   return json.dumps({'count': count, 'html': html})
 
-def add_hostname(url, host):
-  if url.startswith('/') and not url.startswith('//'):
+def add_hostname(url, host, hostrel):
+  if url.startswith('//'):
+    return 'http:' + url
+  elif url.startswith('http'):
+    return url
+  elif url.startswith('/'):
     return host.rstrip('/') + url
-  return url
+  else:
+    return host.rstrip('/') + hostrel.replace("[^/]*$", "/") + url
 
-def capme(host, x):
-  a, b = analyze_image(add_hostname(x, host))
+def capme(host, hostrel, x):
+  print("HOST: " + host)
+  print(add_hostname(x,host, hostrel))
+  a, b = analyze_image(add_hostname(x, host, hostrel))
   return b + " (" + ', '.join(a) + ")"
 
-def convert(html, host):
+def convert(html, host, hostrel):
   if not host.startswith('http'):
     host = 'http://' + host
   soup = BeautifulSoup(html, 'html.parser')
-  do_things_to_html(soup, word_color, lambda x: capme(host, x))
+  do_things_to_html(soup, word_color, lambda x: capme(host, hostrel, x))
   count = word_count(soup)
   return count,minify(soup.prettify()).encode('utf-8')
 
@@ -201,7 +209,7 @@ def main():
 
 </body>
 </html>
-  """, "localhost")
+  """, "localhost", "localhost")
   app.run(debug=False, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':
