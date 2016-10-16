@@ -17,6 +17,11 @@
 	],
 
 	"permissions": [
-		"https://ajax.googleapis.com/"
-	]
+		"https://ajax.googleapis.com/",
+		"storage"
+	],
+
+	"background": {
+		"scripts": ["background.js"]
+	}
 }

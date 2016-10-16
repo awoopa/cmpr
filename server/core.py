@@ -32,11 +32,28 @@ def tokenize(text):
 def do_things_to_html(soup, tokenizer, describer):
   style = soup.new_tag('style', type='text/css')
   style.append(
-'''.cNN { color: red }
-.cVBZ { color: blue }
-.cINV { color: brown }
+'''
+.cNN,
+.cNNP,
+.cNNPS,
+.cNNS {
+    color: #F92672;
+}
+.cVB,
+.cVBD,
+.cVBG,
+.cVBN,
+.cVBP,
+.cVBZ {
+    color: #66D9EF;
+}
+.cINV {
+    color: brown
+}
 .cFIG { display: inline-block; margin: 0 }
-a { text-decoration: underline !important }
+a {
+    text-decoration: underline !important
+}
 ''')
   if not soup.head:
     head = soup.new_tag('head')
