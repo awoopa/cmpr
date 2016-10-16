@@ -41,7 +41,7 @@ def do_things_to_html(soup, tokenizer, describer):
 .cNNPS,
 .cNNS,
 .cPRP {
-    color: #80133A;
+    color: #CC1E5C;
 }
 .cVB,
 .cVBD,
@@ -49,7 +49,7 @@ def do_things_to_html(soup, tokenizer, describer):
 .cVBN,
 .cVBP,
 .cVBZ {
-    color: #367480;
+    color: #57B9CC;
 }
 .cRB,
 .cRBR,
@@ -57,7 +57,7 @@ def do_things_to_html(soup, tokenizer, describer):
 .cJJ,
 .cJJR,
 .cJJS {
-    color: #5E801A;
+    color: #96CC2A;
 }
 
 .cINV {
