@@ -7,6 +7,14 @@ from clarifai.rest import ClarifaiApp
 from flask import Flask, request, jsonify
 from flask.ext.cors import CORS
 
+from htmlmin import minify
+
+from bs4 import BeautifulSoup
+
+from core import *
+
+from nltk.tag.perceptron import PerceptronTagger
+
 app = Flask(__name__)
 CORS(app)
 
@@ -15,15 +23,36 @@ clarifai = ClarifaiApp(app_id='VWLdaFkl56G5o81k54s-ZI6se11adzKSFnVQ_Ggg',
 
 clarifai_model = clarifai.models.get('general-v1.3')
 
+tagger = PerceptronTagger()
+
 @app.route('/convert_html', methods=['POST'])
 def convert_html():
   """
   Given an HTML page as a string, apply all of our comprehension-improving
   transformations, and return the new HTML.
   """
-  data = request.form
+  data = request.get_json(force=True)
   html = data['page']
-  return convert(html)
+  host = data['host']
+  count, html = convert(html, host)
+  return json.dumps({'count': count, 'html': html})
+
+def add_hostname(url, host):
+  if url.startswith('/') and not url.startswith('//'):
+    return host.rstrip('/') + url
+  return url
+
+def capme(host, x):
+  a, b = analyze_image(add_hostname(x, host))
+  return b + " (" + ', '.join(a) + ")"
+
+def convert(html, host):
+  if not host.startswith('http'):
+    host = 'http://' + host
+  soup = BeautifulSoup(html, 'html.parser')
+  do_things_to_html(soup, word_color, lambda x: capme(host, x))
+  count = word_count(soup)
+  return count,minify(soup.prettify()).encode('utf-8')
 
 def clarifai_analysis(image_url, tag_limit=10):
   """
@@ -46,8 +75,8 @@ def oxford_project_analysis(image_url):
   jres = json.loads(res.text)
 
   return (
-    jres['description']['tags'],
-    jres['description']['captions'][0]['text'] if len(jres['descriptions']['captions']) else ''
+    jres[u'description'][u'tags'],
+    jres[u'description'][u'captions'][0][u'text'] if len(jres[u'description'][u'captions']) else ''
   )
   
 def analyze_image(image_url, tag_limit=10): 
@@ -58,8 +87,8 @@ def analyze_image(image_url, tag_limit=10):
     (1) A list of tags, limited by tag_limit,
     (2) A description of the image
   """
-  clarifai_tags = clarifai_analysis(image_url),
-  ms_tags, ms_caption = oxford_project_analys(image_url)
+  clarifai_tags = clarifai_analysis(image_url)
+  ms_tags, ms_caption = oxford_project_analysis(image_url)
 
   clarifai_tags = map(lambda s: s.lower(), clarifai_tags)
   ms_tags = map(lambda s: s.lower(), ms_tags)
@@ -72,7 +101,7 @@ def analyze_image(image_url, tag_limit=10):
       merged_tags.append(tag)
  
   merged_tags_set = set(merged_tags)
-  merged_tags += [tag for tag in clarifa_tags if tag not in merged_tags]
+  merged_tags += [tag for tag in clarifai_tags if tag not in merged_tags]
   merged_tags += [tag for tag in ms_tags if tag not in merged_tags]
 
   # Limit the tags
@@ -85,17 +114,20 @@ def pos_tagging(text):
   Given some text as input, return the part of speech tagging as determined by
   the Microsoft Cognitive Services API.
   """
-  json_txt = {'language': 'en',
-          'analyzerIds' : ["4fa79af1-f22c-408d-98bb-b7d7aeef7f04"],
-          'text': text}
-  headers = {'Ocp-Apim-Subscription-Key': '6728888dd73c45ada252a5f46cb0ccba'}
-  res = requests.post('https://api.projectoxford.ai/linguistics/v1.0/analyze',
-                       headers=headers,
-                       json=json_txt)
-  
-  jres = json.loads(res.text)
-
-  return jres[0]['result'][0]
+#  json_txt = {'language': 'en',
+#          'analyzerIds' : ["4fa79af1-f22c-408d-98bb-b7d7aeef7f04"],
+#          'text': text}
+#  headers = {'Ocp-Apim-Subscription-Key': '6728888dd73c45ada252a5f46cb0ccba'}
+#  res = requests.post('https://api.projectoxford.ai/linguistics/v1.0/analyze',
+#                       headers=headers,
+#                       json=json_txt)
+#  
+#  jres = json.loads(res.text)
+#  if 'error' in jres:
+#    return [tup[1] for tup in tagger.tag(nltk.word_tokenize(text))]
+#
+#  return jres[0]['result'][0]
+   return [tup[1] for tup in tagger.tag(nltk.word_tokenize(text))]
 
 def word_color(text):
   """
@@ -150,9 +182,28 @@ def word_color(text):
 
   return merged_word_tups
 
+def summarize(text, target_sentences=5):
+  """
+  Given all the text in a page, determine a number of summarizing sentences.
+  """
+
+
 def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
-  app.run(debug=False, use_reloader=False)
+  import pdb; pdb.set_trace()
+  convert("""
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+
+<p>My first paragraph.</p>
+
+</body>
+</html>
+  """, "localhost")
+  app.run(debug=False, use_reloader=False, host='0.0.0.0')
 
 if __name__ == '__main__':
   main()
