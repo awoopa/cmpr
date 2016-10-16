@@ -1,5 +1,6 @@
 var timerStart;
 var numWords;
+var summary = [];
 function colourize() {
 	var html = document.documentElement.innerHTML;
 	console.log("colourize()");
@@ -33,6 +34,7 @@ function colourize() {
 			document.documentElement.innerHTML = data.html;
 			numWords = data.count;
 			timerStart = Date.now();
+			summary = data.summary;
 		})
 	})
 }
@@ -53,6 +55,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	}
 });
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.getSummary) {
+	   sendResponse({summary: summary});
+	}
+});
+
 
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
@@ -63,8 +71,20 @@ chrome.runtime.onMessage.addListener(
 			} else {
 			    var timer = Date.now() - timerStart;
 				var wpm = Math.round((numWords/(timer/1000))*60);
-				console.log(`WPM: ${wpm}`)
-				chrome.runtime.sendMessage({wpm: wpm});
+				console.log(`WPM: ${wpm}`);
+
+				chrome.storage.local.get({'wpmData': []}, data => {
+					var wpmData = data.wpmData;
+					var c = new Date();
+					var timestamp = c.getFullYear() + '-' + (c.getMonth() + 1) + '-' +
+									c.getDate() + ' ' + c.getHours() + ':' + c.getMinutes() + ':' +
+									c.getSeconds();
+					wpmData.push({wpm, timestamp});
+					console.log('SAVING WPM DATA');
+					chrome.storage.local.set({'wpmData': wpmData }, () => {
+						chrome.storage.local.get('wpmData', res => {console.log(res)});
+					})
+				})
 			}
 			state = !state;
 			sendResponse({state:state});

@@ -5,6 +5,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	    state = response.state;
 
 	    document.getElementById('enableTagging').checked = state;
+
+    	chrome.tabs.sendMessage(tabs[0].id, {getSummary: true}, function (summaries) {
+    	    var summary = document.getElementById('summary-holder');
+
+		    summaries.summary.forEach(e => {
+		    	var el = document.createElement('li');
+		    	el.innerText = e;
+		    	summary.appendChild(el);
+		    })
+    	});
 	  });
 	});
 
