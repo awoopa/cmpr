@@ -6,6 +6,7 @@ chrome.runtime.onMessage.addListener(
 	}
 });
 
+
 function saveWPMData(wpm) {
 	chrome.storage.local.get({'wpmData': []}, data => {
 		var wpmData = data.wpmData;
