@@ -8,7 +8,8 @@ function colourize() {
 		method: 'POST',
 		body: JSON.stringify({
 			page: html,
-			host: `//${window.location.origin}`
+			host: window.location.origin,
+			host_rel: window.location.pathname
 		})
 	}).then(res => {
 		res.json().then(data => {
