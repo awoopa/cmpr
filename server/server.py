@@ -161,6 +161,11 @@ def word_color(text):
 
   return merged_word_tups
 
+def summarize(text, target_sentences=5):
+  """
+  Given all the text in a page, determine a number of summarizing sentences.
+  """
+
 def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
   import pdb; pdb.set_trace()
