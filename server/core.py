@@ -26,7 +26,7 @@ def word_count(soup):
 
 def all_text(soup):
   texts = soup.find_all(string=True)
-  return "\n".join(map(unicode, filter(visible, texts)))
+  return " ".join(map(unicode, filter(visible, texts)))
 
 def tokenize(text):
   from random import randint

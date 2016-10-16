@@ -41,9 +41,9 @@ total_word_counts = {}
 for s in brown.sents():
   s = map(lambda k: k.lower(), s)
   for w in set(s):
-    if w not in word_counts:
-      word_counts[w] = 0
-    word_couts[w] += 1
+    if w not in total_word_counts:
+      total_word_counts[w] = 0
+    total_word_counts[w] += 1
 
 brown_sent_count = len(brown.sents())
 rapid = RapidConnect('cmpre', 'a0c4b418-1531-4c31-abbe-24df50f8a74b');
@@ -59,6 +59,7 @@ def convert_html():
   host = data['host']
   hostrel = data['hostrel']
   count, html, summary = convert(html, host, hostrel)
+  print(summary)
   return json.dumps({'count': count, 'html': html, 'summary': summary})
 
 def add_hostname(url, host, hostrel):
@@ -82,7 +83,7 @@ def convert(html, host, hostrel):
   do_things_to_html(soup, word_color, lambda x: capme(host, hostrel, x))
   count = word_count(soup)
   summary = summarize(all_text(soup))
-  return count,minify(soup.prettify()).encode('utf-8'), sumamry
+  return count,minify(soup.prettify()).encode('utf-8'), summary 
 
 def clarifai_analysis(image_url, tag_limit=10):
   """
@@ -228,7 +229,7 @@ def word_color(text):
 
   return merged_word_tups
 
-def summarize(text, target_sentences=5):
+def summarize(text, target_sentences=3):
   """
   Given all the text in a page, determine a number of summarizing sentences.
   """
@@ -279,7 +280,7 @@ def summarize(text, target_sentences=5):
     tfidf = {}
     for word in counts.keys():
       tfidf[word] = (0.5 + 0.5*counts[word]/max_count) 
-      tfidf[word] *= math.log(1 + brown_sent_count/total_word_counts(word))
+      tfidf[word] *= math.log(1 + brown_sent_count/total_word_counts.get(word,1))
 
     return tfidf
 
@@ -306,7 +307,7 @@ def summarize(text, target_sentences=5):
 
   scores = page_rank(matrix)
 
-  return [sentences[i] for i in sorted(i, key=-scores[i])][:target_sentences]
+  return [sentences[i] for i in sorted(range(len(scores)), key=lambda x: -scores[x])][:target_sentences]
 
 def main():
   print word_color("The cat in the hat likes funny memes -- I do too!")
