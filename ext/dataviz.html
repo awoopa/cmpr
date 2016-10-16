@@ -8,23 +8,28 @@
 	<head>
 		<title>Getting Started Extension's Popup</title>
 		<style>
+			html,
+			body {
+				height: 100%;
+				width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
 			body {
 				font-family: "Segoe UI", "Lucida Grande", Tahoma, sans-serif;
 				font-size: 100%;
-				width: 400px;
 			}
-			#status {
-				/* avoid an excessively wide status text */
-				white-space: pre;
-				text-overflow: ellipsis;
-				overflow: hidden;
-				max-width: 500px;
+
+			#wpmChart {
+				width: 100%;
+				height: 300px;
 			}
 		</style>
-		<script src="popup.js"></script>
+		<script src="chart.js"></script>
+		<script src="dataviz.js"></script>
 	</head>
 	<body>
-		<div id="status"></div>
-		<img id="image-result" hidden>
+	<canvas id="wpmChart"></canvas>
 	</body>
 </html>
