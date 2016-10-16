@@ -39,6 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				}]
 			},
 			options: {
+				response: false,
+				maintainAspectRatio: false,
 				scales: {
 					xAxes: [{
 						type: 'time'
