@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(
 		  console.log('COLOURIZING');
 		} else if (request.colourize === false) {
 		    var timer = Date.now() - timerStart;
-			var wpm = (numWords/(timer/1000))*60;
+			var wpm = Math.round((numWords/(timer/1000))*60);
 			console.log(`WPM: ${wpm}`)
 			chrome.runtime.sendMessage({wpm: wpm});
 		}
