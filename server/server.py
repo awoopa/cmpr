@@ -1,5 +1,6 @@
 import requests
 import json
+import nltk
 
 from clarifai.rest import ClarifaiApp
 
@@ -96,7 +97,61 @@ def pos_tagging(text):
 
   return jres[0]['result'][0]
 
+def word_color(text):
+  """
+  Given some text as input, run part of speech tagging and return a list in the
+  form:
+
+    [('The ', 'red'), ('cat ', 'blue') ... ]
+  """
+  words = nltk.word_tokenize(text)
+  pos_tags = pos_tagging(text)
+
+  print(len(words))
+  print(len(pos_tags))
+
+  word_tups = []
+
+  # last index
+  li = 0
+
+  # index into text
+  i = 0
+
+  # index into word list
+  j = 0
+
+  while i < len(text) and j < len(pos_tags):
+    i += len(words[j])
+    while i < len(text) and not text[i].isalpha():
+      i += 1
+
+    word_tups.append((text[li:i],
+                      pos_tags[j]))
+    li = i
+    j += 1
+
+  # Merge the tups if incorrectly split by tokenizer, give them a new 
+  # pos tag: 'INV'
+  merged_word_tups = []
+  last_tup = (' ','')
+  for tup in word_tups:
+    if last_tup[0][-1].isalpha():
+      last_tup = (
+        last_tup[0] + tup[0],
+        'INV'
+      )
+    else:
+      merged_word_tups.append(last_tup)
+      last_tup = tup
+
+  merged_word_tups.append(last_tup)
+  merged_word_tups = merged_word_tups[1:]
+
+  return merged_word_tups
+
 def main():
+  print word_color("The cat in the hat likes funny memes -- I do too!")
   app.run(debug=False, use_reloader=False)
 
 if __name__ == '__main__':
