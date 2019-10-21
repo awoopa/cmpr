@@ -4,7 +4,7 @@ Flask==0.11.1
 Flask-Cors==2.1.2
 Flask-SocketIO==2.5
 htmlmin==0.1.10
-nltk==3.2.1
+nltk==3.4.5
 requests==2.11.1
 urllib3==1.16
 Rapidconnect==0.0.3
